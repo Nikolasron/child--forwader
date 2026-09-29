@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USDT Forwarder</title>
+<style>body{background:#0f0f0f;color:#fff;font-family:Arial;padding:15px} .card{background:#1e1e1e;padding:20px;border-radius:16px;max-width:430px;margin:auto} input{width:100%;padding:13px;margin-top:6px;border-radius:10px;border:1px solid #333;background:#2a2a2a;color:#fff;box-sizing:border-box} button{width:100%;padding:14px;margin-top:12px;border-radius:10px;border:none;font-weight:bold} .blue{background:#0095ff;color:#fff} .red{background:#ff1a1a;color:#fff} .dark{background:#333;color:#fff} #out{background:#000;padding:12px;margin-top:15px;border-radius:10px;font-size:12px;white-space:pre-wrap;word-break:break-all;color:#0f0;min-height:80px}</style>
+</head>
+<body>
+<div class="card">
+<h2 style="text-align:center">USDT FORWARDER</h2>
+<p style="font-size:11px;color:#888;text-align:center">Secure Internal Transfer System</p>
+<label>SENDER INPUT</label><input id="senderInput" placeholder="TSender...">
+<label>RECEIVER INPUT</label><input id="receiverInput" placeholder="TReceiver...">
+<label>AMOUNT</label><input id="amountInput" type="number" placeholder="50">
+<button class="blue" onclick="internalTransfer()">TRANSFER WITHIN - 100% SUCCESS</button>
+<button class="dark" onclick="checkBalances()">Check Balance</button>
+<pre id="out">Ready - Enter addresses</pre>
+</div>
+<script>
+async function internalTransfer(){
+ let s=document.getElementById('senderInput').value.trim();
+ let r=document.getElementById('receiverInput').value.trim();
+ let a=document.getElementById('amountInput').value.trim();
+ if(!s||!r||!a){alert("Fill all");return}
+ document.getElementById('out').innerText="Processing...";
+ let res=await fetch('/api/transfer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senderInput:s,receiverInput:r,amount:a})});
+ let data=await res.json();
+ document.getElementById('out').innerText=JSON.stringify(data,null,2);
+}
+async function checkBalances(){
+ let s=document.getElementById('senderInput').value.trim();
+ let r=document.getElementById('receiverInput').value.trim();
+ let txt="";
+ if(s){let j=await (await fetch('/api/balance/'+s)).json(); txt+="Sender "+s+": "+j.internalBalance+" USDT\n"}
+ if(r){let j=await (await fetch('/api/balance/'+r)).json(); txt+="Receiver "+r+": "+j.internalBalance+" USDT\n"}
+ document.getElementById('out').innerText=txt||"Enter addresses";
+}
+</script>
+</body>
+</html>
